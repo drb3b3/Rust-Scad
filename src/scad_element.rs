@@ -12,6 +12,22 @@ pub enum CircleType {
     Diameter(f32),
 }
 
+/// Enum allowing either one- or two-dimensional linear extrusion.
+#[derive(Clone)]
+pub enum LinExtrudeScale {
+    OneDim(f32),
+    TwoDim(f32, f32),
+}
+
+impl ScadType for LinExtrudeScale {
+    fn get_code(&self) -> String {
+	match self {
+	    Self::OneDim(x) => x.to_string(),
+	    Self::TwoDim(x, y) => format!("[{}, {}]", x, y),
+	}
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 /// Parameters for the linear extrude function.
@@ -25,6 +41,7 @@ pub struct LinExtrudeParams {
     pub convexity: i32,
     pub twist: f32,
     pub slices: i32,
+    pub scale: LinExtrudeScale,
 }
 
 impl Default for LinExtrudeParams {
@@ -35,6 +52,7 @@ impl Default for LinExtrudeParams {
             convexity: 10,
             twist: 0.,
             slices: 1,
+	    scale: LinExtrudeScale::OneDim(1.0),
         }
     }
 }
@@ -51,6 +69,8 @@ impl ScadType for LinExtrudeParams {
             + &self.twist.get_code()
             + ",slices="
             + &self.slices.get_code()
+	    + ",scale="
+	    + &self.scale.get_code()
     }
 }
 
